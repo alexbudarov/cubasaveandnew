@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<views xmlns="http://schemas.haulmont.com/cuba/view.xsd">
+
+    <view entity="testaddandcreatenew_Parent" name="parent-view" extends="_local">
+        <property name="children" view="_minimal"/>
+    </view>
+</views>
