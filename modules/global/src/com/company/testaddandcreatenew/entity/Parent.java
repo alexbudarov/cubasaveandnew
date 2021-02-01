@@ -26,6 +26,7 @@ public class Parent extends StandardEntity {
     @OnDelete(DeletePolicy.CASCADE)
     @OneToMany(mappedBy = "parent")
     protected List<Child> children = new ArrayList<>();
+    //protected List<Child> children;
 
     public List<Child> getChildren() {
         return children;
