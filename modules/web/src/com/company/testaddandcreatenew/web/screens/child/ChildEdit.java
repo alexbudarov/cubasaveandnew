@@ -11,6 +11,8 @@ import com.haulmont.cuba.gui.screen.*;
 import com.company.testaddandcreatenew.entity.Child;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 @UiController("testaddandcreatenew_Child.edit")
 @UiDescriptor("child-edit.xml")
@@ -22,14 +24,17 @@ public class ChildEdit extends StandardEditor<Child> {
     @Inject
     private DataContext dataContext;
 
+    private final List<Child> additionalNewEntities = new ArrayList<>();
+    private Parent parentEntity;
+
     @Subscribe("saveAndNew")
     public void onSaveAndNew(Action.ActionPerformedEvent event) {
         if (validateScreen().isEmpty()) {
-            Parent parent = getEditedEntity().getParent();
-            parent.getChildren().add(getEditedEntity());
             commitChanges()
                     .then(() -> {
-                        commitActionPerformed = true;
+                        // commented
+                        // commitActionPerformed = true;
+
                         if (showSaveNotification) {
                             Entity entity = getEditedEntity();
                             MetadataTools metadataTools = getBeanLocator().get(MetadataTools.NAME);
@@ -41,11 +46,27 @@ public class ChildEdit extends StandardEditor<Child> {
                                             metadataTools.getInstanceName(entity)))
                                     .show();
                         }
+
+                        // remember committed entities before last one
+                        additionalNewEntities.add(getEditedEntity());
+
+                        // create new item, set as edited entity
+                        Child newItem = dataContext.create(Child.class);
+                        newItem.setParent(parentEntity);
+                        getEditedEntityContainer().setItem(newItem);
+
+                        // to prevent "unsaved changes"
+                        setModifiedAfterOpen(false);
                     });
-            // create new item, set as edited entity
-            Child newItem = dataContext.create(Child.class);
-            newItem.setParent(parent);
-            getEditedEntityContainer().setItem(newItem);
         }
+    }
+
+    public List<Child> getAdditionalNewEntities() {
+        return additionalNewEntities;
+    }
+
+
+    public void setParentEntity(Parent parentEntity) {
+        this.parentEntity = parentEntity;
     }
 }
